@@ -14,6 +14,21 @@
 		760160F52C09F8D100008612 /* NotesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 760160F42C09F8D100008612 /* NotesTests.swift */; };
 		760160FF2C09F8D100008612 /* NotesUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 760160FE2C09F8D100008612 /* NotesUITests.swift */; };
 		760161012C09F8D100008612 /* NotesUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 760161002C09F8D100008612 /* NotesUITestsLaunchTests.swift */; };
+		7601610E2C09FF9D00008612 /* CounterFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7601610D2C09FF9D00008612 /* CounterFeature.swift */; };
+		760161122C0A01B300008612 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 760161112C0A01B300008612 /* ComposableArchitecture */; };
+		760161162C0F15CD00008612 /* CounterFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 760161152C0F15CD00008612 /* CounterFeatureTests.swift */; };
+		760161192C0F1C3C00008612 /* NumberFactClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 760161172C0F1C3600008612 /* NumberFactClient.swift */; };
+		7601611C2C0F22C600008612 /* AppFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7601611A2C0F21AB00008612 /* AppFeature.swift */; };
+		7601611E2C0F23C000008612 /* AppFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7601611D2C0F23C000008612 /* AppFeatureTests.swift */; };
+		760161212C14316200008612 /* ContactsFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7601611F2C14315E00008612 /* ContactsFeature.swift */; };
+		760161242C1435D700008612 /* AddContactFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 760161222C14357F00008612 /* AddContactFeature.swift */; };
+		763DACE02C26EB440066665F /* NotesFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763DACDF2C26EB440066665F /* NotesFeature.swift */; };
+		763DACE22C26F2380066665F /* AddNotesFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763DACE12C26F2380066665F /* AddNotesFeature.swift */; };
+		763DACE52C27027E0066665F /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763DACE42C27027E0066665F /* Note.swift */; };
+		763DACE72C27EC5A0066665F /* SwiftDataModelConfigurationProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763DACE62C27EC5A0066665F /* SwiftDataModelConfigurationProvider.swift */; };
+		763DACE92C27ED5E0066665F /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763DACE82C27ED5E0066665F /* Database.swift */; };
+		763DACEB2C27EF9E0066665F /* NoteDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763DACEA2C27EF9E0066665F /* NoteDatabase.swift */; };
+		7654A5A92C1EC28800E45D6C /* ContactsFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7654A5A82C1EC28800E45D6C /* ContactsFeatureTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -44,6 +59,21 @@
 		760160FA2C09F8D100008612 /* NotesUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NotesUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		760160FE2C09F8D100008612 /* NotesUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesUITests.swift; sourceTree = "<group>"; };
 		760161002C09F8D100008612 /* NotesUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		7601610D2C09FF9D00008612 /* CounterFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CounterFeature.swift; sourceTree = "<group>"; };
+		760161142C0A156200008612 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
+		760161152C0F15CD00008612 /* CounterFeatureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CounterFeatureTests.swift; sourceTree = "<group>"; };
+		760161172C0F1C3600008612 /* NumberFactClient.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NumberFactClient.swift; sourceTree = "<group>"; };
+		7601611A2C0F21AB00008612 /* AppFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFeature.swift; sourceTree = "<group>"; };
+		7601611D2C0F23C000008612 /* AppFeatureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppFeatureTests.swift; sourceTree = "<group>"; };
+		7601611F2C14315E00008612 /* ContactsFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsFeature.swift; sourceTree = "<group>"; };
+		760161222C14357F00008612 /* AddContactFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddContactFeature.swift; sourceTree = "<group>"; };
+		763DACDF2C26EB440066665F /* NotesFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotesFeature.swift; sourceTree = "<group>"; };
+		763DACE12C26F2380066665F /* AddNotesFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddNotesFeature.swift; sourceTree = "<group>"; };
+		763DACE42C27027E0066665F /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
+		763DACE62C27EC5A0066665F /* SwiftDataModelConfigurationProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftDataModelConfigurationProvider.swift; sourceTree = "<group>"; };
+		763DACE82C27ED5E0066665F /* Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
+		763DACEA2C27EF9E0066665F /* NoteDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDatabase.swift; sourceTree = "<group>"; };
+		7654A5A82C1EC28800E45D6C /* ContactsFeatureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsFeatureTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -51,6 +81,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				760161122C0A01B300008612 /* ComposableArchitecture in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -74,10 +105,12 @@
 		760160D72C09F8CE00008612 = {
 			isa = PBXGroup;
 			children = (
+				760161132C0A01C200008612 /* TCA */,
 				760160E22C09F8CE00008612 /* Notes */,
 				760160F32C09F8D100008612 /* NotesTests */,
 				760160FD2C09F8D100008612 /* NotesUITests */,
 				760160E12C09F8CE00008612 /* Products */,
+				760161102C0A01B300008612 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -94,6 +127,9 @@
 		760160E22C09F8CE00008612 /* Notes */ = {
 			isa = PBXGroup;
 			children = (
+				763DACE32C2702690066665F /* Persistence */,
+				763DACDD2C26EB0C0066665F /* Features */,
+				760161142C0A156200008612 /* Info.plist */,
 				760160E32C09F8CE00008612 /* NotesApp.swift */,
 				760160E52C09F8CE00008612 /* ContentView.swift */,
 				760160E72C09F8D000008612 /* Assets.xcassets */,
@@ -114,6 +150,9 @@
 			isa = PBXGroup;
 			children = (
 				760160F42C09F8D100008612 /* NotesTests.swift */,
+				760161152C0F15CD00008612 /* CounterFeatureTests.swift */,
+				7601611D2C0F23C000008612 /* AppFeatureTests.swift */,
+				7654A5A82C1EC28800E45D6C /* ContactsFeatureTests.swift */,
 			);
 			path = NotesTests;
 			sourceTree = "<group>";
@@ -125,6 +164,45 @@
 				760161002C09F8D100008612 /* NotesUITestsLaunchTests.swift */,
 			);
 			path = NotesUITests;
+			sourceTree = "<group>";
+		};
+		760161102C0A01B300008612 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		760161132C0A01C200008612 /* TCA */ = {
+			isa = PBXGroup;
+			children = (
+				7601610D2C09FF9D00008612 /* CounterFeature.swift */,
+				760161172C0F1C3600008612 /* NumberFactClient.swift */,
+				7601611A2C0F21AB00008612 /* AppFeature.swift */,
+				7601611F2C14315E00008612 /* ContactsFeature.swift */,
+				760161222C14357F00008612 /* AddContactFeature.swift */,
+			);
+			path = TCA;
+			sourceTree = "<group>";
+		};
+		763DACDD2C26EB0C0066665F /* Features */ = {
+			isa = PBXGroup;
+			children = (
+				763DACDF2C26EB440066665F /* NotesFeature.swift */,
+				763DACE12C26F2380066665F /* AddNotesFeature.swift */,
+			);
+			path = Features;
+			sourceTree = "<group>";
+		};
+		763DACE32C2702690066665F /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				763DACE42C27027E0066665F /* Note.swift */,
+				763DACE62C27EC5A0066665F /* SwiftDataModelConfigurationProvider.swift */,
+				763DACE82C27ED5E0066665F /* Database.swift */,
+				763DACEA2C27EF9E0066665F /* NoteDatabase.swift */,
+			);
+			path = Persistence;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -143,6 +221,9 @@
 			dependencies = (
 			);
 			name = Notes;
+			packageProductDependencies = (
+				760161112C0A01B300008612 /* ComposableArchitecture */,
+			);
 			productName = Notes;
 			productReference = 760160E02C09F8CE00008612 /* Notes.app */;
 			productType = "com.apple.product-type.application";
@@ -215,6 +296,9 @@
 				Base,
 			);
 			mainGroup = 760160D72C09F8CE00008612;
+			packageReferences = (
+				7601610F2C0A000900008612 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
+			);
 			productRefGroup = 760160E12C09F8CE00008612 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -257,8 +341,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7601610E2C09FF9D00008612 /* CounterFeature.swift in Sources */,
+				7601611C2C0F22C600008612 /* AppFeature.swift in Sources */,
+				763DACE72C27EC5A0066665F /* SwiftDataModelConfigurationProvider.swift in Sources */,
+				763DACE22C26F2380066665F /* AddNotesFeature.swift in Sources */,
+				763DACE02C26EB440066665F /* NotesFeature.swift in Sources */,
 				760160E62C09F8CE00008612 /* ContentView.swift in Sources */,
+				763DACE92C27ED5E0066665F /* Database.swift in Sources */,
+				763DACEB2C27EF9E0066665F /* NoteDatabase.swift in Sources */,
+				763DACE52C27027E0066665F /* Note.swift in Sources */,
 				760160E42C09F8CE00008612 /* NotesApp.swift in Sources */,
+				760161242C1435D700008612 /* AddContactFeature.swift in Sources */,
+				760161192C0F1C3C00008612 /* NumberFactClient.swift in Sources */,
+				760161212C14316200008612 /* ContactsFeature.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -267,6 +362,9 @@
 			buildActionMask = 2147483647;
 			files = (
 				760160F52C09F8D100008612 /* NotesTests.swift in Sources */,
+				760161162C0F15CD00008612 /* CounterFeatureTests.swift in Sources */,
+				7601611E2C0F23C000008612 /* AppFeatureTests.swift in Sources */,
+				7654A5A92C1EC28800E45D6C /* ContactsFeatureTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -347,7 +445,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -404,7 +502,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 17.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -425,6 +523,7 @@
 				DEVELOPMENT_TEAM = P2H6L4K6SX;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Notes/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -454,6 +553,7 @@
 				DEVELOPMENT_TEAM = P2H6L4K6SX;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = Notes/Info.plist;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -588,6 +688,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		7601610F2C0A000900008612 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.10.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		760161112C0A01B300008612 /* ComposableArchitecture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 7601610F2C0A000900008612 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
+			productName = ComposableArchitecture;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 760160D82C09F8CE00008612 /* Project object */;
 }

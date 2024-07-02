@@ -6,12 +6,19 @@
 //
 
 import SwiftUI
+import ComposableArchitecture
 
 @main
 struct NotesApp: App {
+    static let store = Store(initialState: NotesFeature.State()) {
+        NotesFeature()
+            ._printChanges()
+    }
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            NotesView(store: Self.store)
+//            AppView(store: Self.store)
         }
     }
 }
