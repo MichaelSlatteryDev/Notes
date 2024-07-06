@@ -9,22 +9,8 @@ import Foundation
 import ComposableArchitecture
 import SwiftUI
 
-struct Note: Identifiable, Equatable {
-    let id: UUID
-    var title: String
-    var body: String
-
-    init(id: UUID, title: String, body: String) {
-        self.id = id
-        self.title = title
-        self.body = body
-    }
-
-    static func == (lhs: Note, rhs: Note) -> Bool {
-        lhs.id == rhs.id &&
-        lhs.title == rhs.title &&
-        lhs.body == rhs.body
-    }
+extension URL {
+    static let notes = Self.documentsDirectory.appending(component: "notes.json")
 }
 
 @Reducer
@@ -33,16 +19,27 @@ struct NotesFeature {
     struct State: Equatable {
         @Presents var destination: Destination.State?
         var notes: IdentifiedArrayOf<Note> = []
+        
+        init(destination: Destination.State? = nil) {
+            self.destination = destination
+            do {
+                @Dependency(\.dataManager.load) var loadData
+                self.notes = try JSONDecoder().decode(IdentifiedArrayOf<Note>.self, from: loadData(.notes))
+            } catch {
+                notes = []
+            }
+        }
     }
     
     enum Action {
         case addNoteTapped
         case editNoteTapped(Note)
+        case deleteButtonTapped(Note.ID)
         case destination(PresentationAction<Destination.Action>)
-//        case fetchNotes
     }
     
     @Dependency(\.uuid) var uuid
+    @Dependency(\.dataManager.save) var saveData
     
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -57,15 +54,22 @@ struct NotesFeature {
                     AddNotesFeature.State(note: .init(id: note.id, title: note.title, body: note.body))
                 )
                 return .none
+            case .deleteButtonTapped(let id):
+                state.notes.remove(id: id)
+                return .run { [notes = state.notes] _ in
+                    try self.saveData(JSONEncoder().encode(notes), .notes)
+                }
             case .destination(.presented(.addNote(.delegate(.saveNote(let note))))):
-                state.notes.append(note)
-                return .none
+                if let index = state.notes.firstIndex(of: note) {
+                    state.notes[index] = note
+                } else {
+                    state.notes.append(note)
+                }
+                return .run { [notes = state.notes] _ in
+                    try self.saveData(JSONEncoder().encode(notes), .notes)
+                }
             case .destination:
                 return .none
-//            case .fetchNotes:
-//                let fetchResults = state.fetchNotes()
-//                state.notes += fetchResults
-//                return .none
             }
         }
         .ifLet(\.$destination, action: \.destination)
@@ -87,19 +91,25 @@ struct NotesView: View {
         NavigationStack {
             List {
                 ForEach(store.notes) { note in
-                    Text(note.title)
+                    HStack {
+                        HStack {
+                            Text(note.title)
+                            Spacer()
+                        }
+                        .contentShape(Rectangle())
                         .onTapGesture {
                             store.send(.editNoteTapped(note))
                         }
-//                    HStack {
-//                        Spacer()
-//                        Button {
-//                            store.send(.deleteButtonTapped(contact.id))
-//                        } label: {
-//                            Image(systemName: "trash")
-//                                .foregroundStyle(Color.red)
-//                        }
-//                    }
+                        
+                        Button {
+                            store.send(.deleteButtonTapped(note.id))
+                        } label: {
+                            Image(systemName: "trash")
+                                .foregroundStyle(Color.red)
+                        }
+                        .padding(8)
+                    }
+                    .contentShape(Rectangle())
                 }
             }
             .navigationTitle("Notes")
@@ -118,16 +128,17 @@ struct NotesView: View {
                 AddNotesView(store: addNotesStore)
             }
         }
-//        .alert($store.scope(state: \.destination?.alert, action: \.destination.alert))
     }
 }
 
 #Preview {
     NotesView(store: Store(
-        initialState: NotesFeature.State(
-            notes: [.init(id: UUID(), title: "Title 1", body: "Foo"),
-                    .init(id: UUID(), title: "Title 2", body: "Bar"),
-                    .init(id: UUID(), title: "Title 3", body: "Test")])) {
-        NotesFeature()
-    })
+        initialState: NotesFeature.State()) {
+            NotesFeature()
+        } withDependencies: {
+            $0.dataManager = .mock(initalData: try? JSONEncoder().encode([Note(id: UUID(), title: "Title 1", body: "Foo"),
+                                                                          Note(id: UUID(), title: "Title 2", body: "Bar"),
+                                                                          Note(id: UUID(), title: "Title 3", body: "Test")]))
+        }
+    )
 }
