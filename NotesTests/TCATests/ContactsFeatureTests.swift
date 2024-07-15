@@ -10,8 +10,9 @@ import XCTest
 
 @testable import Notes
 
-@MainActor
 final class ContactsFeatureTests: XCTestCase {
+    
+    @MainActor
     func testAddFlow() async {
         let store = TestStore(initialState: ContactsFeature.State()) {
             ContactsFeature()
@@ -45,6 +46,7 @@ final class ContactsFeatureTests: XCTestCase {
         }
     }
     
+    @MainActor
     func testAddFlow_NonExhaustive() async {
         let store = TestStore(initialState: ContactsFeature.State()) {
             ContactsFeature()
@@ -67,6 +69,7 @@ final class ContactsFeatureTests: XCTestCase {
         }
     }
     
+    @MainActor
     func testDeleteFlow_NonExhaustive() async {
         let store = TestStore(initialState: ContactsFeature.State(contacts: [
             .init(id: UUID(0), name: "Michael")

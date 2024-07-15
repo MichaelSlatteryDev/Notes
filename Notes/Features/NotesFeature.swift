@@ -36,9 +36,11 @@ struct NotesFeature {
         case editNoteTapped(Note)
         case deleteButtonTapped(Note.ID)
         case destination(PresentationAction<Destination.Action>)
+        case fetchNotes
+        case notesFetched(IdentifiedArrayOf<Note>)
     }
     
-    @Dependency(\.uuid) var uuid
+//    @Dependency(\.uuid) var uuid
     @Dependency(\.dataManager.save) var saveData
     
     var body: some ReducerOf<Self> {
@@ -46,7 +48,7 @@ struct NotesFeature {
             switch action {
             case .addNoteTapped:
                 state.destination = .addNote(
-                    AddNotesFeature.State(note: .init(id: self.uuid(), title: "", body: ""))
+                    AddNotesFeature.State(note: .init(id: "", title: "", body: ""))
                 )
                 return .none
             case .editNoteTapped(let note):
@@ -69,6 +71,15 @@ struct NotesFeature {
                     try self.saveData(JSONEncoder().encode(notes), .notes)
                 }
             case .destination:
+                return .none
+            case .fetchNotes:
+                return .run { send in
+                    let (data, _) = try await URLSession.shared.data(from: URL(string: "http://localhost:8080/api/notes")!)
+                    let notes = try JSONDecoder().decode(IdentifiedArrayOf<Note>.self, from: data)
+                    await send(.notesFetched(notes))
+                }
+            case .notesFetched(let notes):
+                state.notes = notes
                 return .none
             }
         }
@@ -114,7 +125,13 @@ struct NotesView: View {
             }
             .navigationTitle("Notes")
             .toolbar {
-                ToolbarItem {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button("Refresh") {
+                        store.send(.fetchNotes)
+                    }
+                }
+                
+                ToolbarItem(placement: .topBarTrailing) {
                     Button {
                         store.send(.addNoteTapped)
                     } label: {
@@ -136,9 +153,9 @@ struct NotesView: View {
         initialState: NotesFeature.State()) {
             NotesFeature()
         } withDependencies: {
-            $0.dataManager = .mock(initalData: try? JSONEncoder().encode([Note(id: UUID(), title: "Title 1", body: "Foo"),
-                                                                          Note(id: UUID(), title: "Title 2", body: "Bar"),
-                                                                          Note(id: UUID(), title: "Title 3", body: "Test")]))
+            $0.dataManager = .mock(initalData: try? JSONEncoder().encode([Note(id: "note1", title: "Title 1", body: "Foo"),
+                                                                          Note(id: "note2", title: "Title 2", body: "Bar"),
+                                                                          Note(id: "note3", title: "Title 3", body: "Test")]))
         }
     )
 }
