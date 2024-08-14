@@ -30,7 +30,7 @@ final class NotesFeatureTests: XCTestCase {
         
         store.assert {
             $0.notes = [
-                Note(id: UUID(0), title: "Food", body: "")
+                Note(id: "0", title: "Food", body: "")
             ]
             $0.destination = nil
         }
@@ -42,12 +42,12 @@ final class NotesFeatureTests: XCTestCase {
             NotesFeature()
         } withDependencies: {
             $0.uuid = .incrementing
-            let notes: [Note] = [Note(id: UUID(0), title: "Food", body: "")]
+            let notes: [Note] = [Note(id: "0", title: "Food", body: "")]
             $0.dataManager = .mock(initalData: try? JSONEncoder().encode(notes))
         }
         store.exhaustivity = .off
         
-        await store.send(.deleteButtonTapped(UUID(0)))
+        await store.send(.deleteButtonTapped("0"))
         
         store.assert {
             $0.notes = []

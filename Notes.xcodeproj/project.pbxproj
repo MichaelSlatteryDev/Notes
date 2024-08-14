@@ -30,6 +30,8 @@
 		763DACE92C27ED5E0066665F /* Database.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763DACE82C27ED5E0066665F /* Database.swift */; };
 		763DACEB2C27EF9E0066665F /* NoteDatabase.swift in Sources */ = {isa = PBXBuildFile; fileRef = 763DACEA2C27EF9E0066665F /* NoteDatabase.swift */; };
 		7654A5A92C1EC28800E45D6C /* ContactsFeatureTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7654A5A82C1EC28800E45D6C /* ContactsFeatureTests.swift */; };
+		76C582D82C6C77A70092971A /* LoginFeature.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76C582D72C6C77A70092971A /* LoginFeature.swift */; };
+		76C582DA2C6C79AE0092971A /* User.swift in Sources */ = {isa = PBXBuildFile; fileRef = 76C582D92C6C79AE0092971A /* User.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -76,6 +78,8 @@
 		763DACE82C27ED5E0066665F /* Database.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Database.swift; sourceTree = "<group>"; };
 		763DACEA2C27EF9E0066665F /* NoteDatabase.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteDatabase.swift; sourceTree = "<group>"; };
 		7654A5A82C1EC28800E45D6C /* ContactsFeatureTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsFeatureTests.swift; sourceTree = "<group>"; };
+		76C582D72C6C77A70092971A /* LoginFeature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginFeature.swift; sourceTree = "<group>"; };
+		76C582D92C6C79AE0092971A /* User.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = User.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -209,6 +213,7 @@
 			children = (
 				763DACDF2C26EB440066665F /* NotesFeature.swift */,
 				763DACE12C26F2380066665F /* AddNotesFeature.swift */,
+				76C582D72C6C77A70092971A /* LoginFeature.swift */,
 			);
 			path = Features;
 			sourceTree = "<group>";
@@ -220,6 +225,7 @@
 				763DACE62C27EC5A0066665F /* DataManager.swift */,
 				763DACE82C27ED5E0066665F /* Database.swift */,
 				763DACEA2C27EF9E0066665F /* NoteDatabase.swift */,
+				76C582D92C6C79AE0092971A /* User.swift */,
 			);
 			path = Persistence;
 			sourceTree = "<group>";
@@ -362,7 +368,9 @@
 			files = (
 				7601610E2C09FF9D00008612 /* CounterFeature.swift in Sources */,
 				7601611C2C0F22C600008612 /* AppFeature.swift in Sources */,
+				76C582D82C6C77A70092971A /* LoginFeature.swift in Sources */,
 				763DACE72C27EC5A0066665F /* DataManager.swift in Sources */,
+				76C582DA2C6C79AE0092971A /* User.swift in Sources */,
 				763DACE22C26F2380066665F /* AddNotesFeature.swift in Sources */,
 				763DACE02C26EB440066665F /* NotesFeature.swift in Sources */,
 				760160E62C09F8CE00008612 /* ContentView.swift in Sources */,

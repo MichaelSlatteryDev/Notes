@@ -24,8 +24,4 @@ struct Note: Identifiable, Equatable, Codable {
         self.title = title
         self.body = body
     }
-
-//    static func == (lhs: Note, rhs: Note) -> Bool {
-//        lhs.id == rhs.id
-//    }
 }

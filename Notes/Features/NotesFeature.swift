@@ -40,8 +40,8 @@ struct NotesFeature {
         case notesFetched(IdentifiedArrayOf<Note>)
     }
     
-//    @Dependency(\.uuid) var uuid
     @Dependency(\.dataManager.save) var saveData
+    @Dependency(\.api) var api
     
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -74,7 +74,8 @@ struct NotesFeature {
                 return .none
             case .fetchNotes:
                 return .run { send in
-                    let (data, _) = try await URLSession.shared.data(from: URL(string: "http://localhost:8080/api/notes")!)
+                    let request = URLRequest(url: URL(string: API.Endpoints.notes.rawValue)!)
+                    let (data, _) = try await api.request(request)
                     let notes = try JSONDecoder().decode(IdentifiedArrayOf<Note>.self, from: data)
                     await send(.notesFetched(notes))
                 }
