@@ -10,14 +10,15 @@ import ComposableArchitecture
 
 @main
 struct NotesApp: App {
-    static let store = Store(initialState: NotesFeature.State()) {
-        NotesFeature()
+    static let store = Store(initialState: LoginFeature.State()) {
+        LoginFeature()
             ._printChanges()
     }
     
     var body: some Scene {
         WindowGroup {
-            NotesView(store: Self.store)
+            LoginView(store: Self.store)
+//            NotesView(store: Self.store)
 //            AppView(store: Self.store)
         }
     }

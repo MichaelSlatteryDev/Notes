@@ -13,15 +13,18 @@ struct Note: Identifiable, Equatable, Codable {
         case id
         case title
         case body = "description"
+        case userId
     }
     
     let id: String
     var title: String
     var body: String
+    let userId: Int?
 
-    init(id: String, title: String, body: String) {
+    init(id: String, title: String, body: String, userId: Int? = nil) {
         self.id = id
         self.title = title
         self.body = body
+        self.userId = userId
     }
 }

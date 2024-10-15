@@ -17,17 +17,20 @@ extension URL {
 struct NotesFeature {
     @ObservableState
     struct State: Equatable {
+        var user: User
         @Presents var destination: Destination.State?
         var notes: IdentifiedArrayOf<Note> = []
         
-        init(destination: Destination.State? = nil) {
+        init(user: User, destination: Destination.State? = nil) {
+            self.user = user
             self.destination = destination
-            do {
-                @Dependency(\.dataManager.load) var loadData
-                self.notes = try JSONDecoder().decode(IdentifiedArrayOf<Note>.self, from: loadData(.notes))
-            } catch {
-                notes = []
-            }
+            self.notes = IdentifiedArray(uniqueElements: user.notes)
+//            do {
+//                @Dependency(\.dataManager.load) var loadData
+//                self.notes = try JSONDecoder().decode(IdentifiedArrayOf<Note>.self, from: loadData(.notes))
+//            } catch {
+//                notes = []
+//            }
         }
     }
     
@@ -73,9 +76,9 @@ struct NotesFeature {
             case .destination:
                 return .none
             case .fetchNotes:
-                return .run { send in
-                    let request = URLRequest(url: URL(string: API.Endpoints.notes.rawValue)!)
-                    let (data, _) = try await api.request(request)
+                return .run { [user = state.user] send in
+                    let request = URLRequest(url: URL(string: API.Endpoints.notes.value)!)
+                    let (data, _) = try await api.authorizedRequest(request, user.name, user.password)
                     let notes = try JSONDecoder().decode(IdentifiedArrayOf<Note>.self, from: data)
                     await send(.notesFetched(notes))
                 }
@@ -106,6 +109,7 @@ struct NotesView: View {
                     HStack {
                         HStack {
                             Text(note.title)
+                                .font(.headline)
                             Spacer()
                         }
                         .contentShape(Rectangle())
@@ -120,6 +124,7 @@ struct NotesView: View {
                                 .foregroundStyle(Color.red)
                         }
                         .padding(8)
+                        .accessibilityLabel("Delete note \(note.title)")
                     }
                     .contentShape(Rectangle())
                 }
@@ -151,7 +156,7 @@ struct NotesView: View {
 
 #Preview {
     NotesView(store: Store(
-        initialState: NotesFeature.State()) {
+        initialState: NotesFeature.State(user: .init(name: "Michael", password: "", notes: []))) {
             NotesFeature()
         } withDependencies: {
             $0.dataManager = .mock(initalData: try? JSONEncoder().encode([Note(id: "note1", title: "Title 1", body: "Foo"),
