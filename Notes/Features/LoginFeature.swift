@@ -18,7 +18,7 @@ struct LoginFeature {
     }
     
     enum Action {
-        case loginButtonTapped
+        case login
         case loginSuccess(User)
         case registerButtonTapped
         case registerSuccess
@@ -28,18 +28,28 @@ struct LoginFeature {
     }
     
     @Dependency(\.api) var api
+    @Dependency(\.keychainManager) var keychain
     
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .loginButtonTapped:
+            case .login:
                 return .run { [user = state.user] send in
                     var request = URLRequest(url: URL(string: API.Endpoints.login(user.name).value)!)
                     request.httpMethod = "POST"
-                    
-                    let (data, _) = try await api.authorizedRequest(request, user.name, user.password)
-                    let authorizedUser = try JSONDecoder().decode(User.self, from: data)
-                    await send(.loginSuccess(authorizedUser))
+                    if UserDefaults.standard.string(forKey: "Username") != nil,
+                       keychain.get(.password) != nil {
+                        let (data, _) = try await api.authorizedRequest(request)
+                        let authorizedUser = try JSONDecoder().decode(User.self, from: data)
+                        await send(.loginSuccess(authorizedUser))
+                    } else {
+                        UserDefaults.standard.set(user.name, forKey: "Username")
+                        try keychain.add(.password, user.password)
+                        
+                        let (data, _) = try await api.authorizedRequest(request)
+                        let authorizedUser = try JSONDecoder().decode(User.self, from: data)
+                        await send(.loginSuccess(authorizedUser))
+                    }
                 } catch: { error, send in
                     print(error)
                 }
@@ -95,7 +105,7 @@ struct LoginView: View {
                 .textFieldStyle(RoundedBorderTextFieldStyle())
             
             Button(action: {
-                store.send(.loginButtonTapped)
+                store.send(.login)
             },
             label: {
                 Text("Log In")

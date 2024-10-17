@@ -82,7 +82,7 @@ struct AddNotesView: View {
 
 #Preview {
     NavigationStack {
-        AddNotesView(store: Store(initialState: AddNotesFeature.State(note: Note(id: "note1", title: "Test", body: "Hello World!", userId: 1))) {
+        AddNotesView(store: Store(initialState: AddNotesFeature.State(note: Note(id: "note1", title: "Test", body: "Hello World!", userId: "1"))) {
             AddNotesFeature()
         })
     }

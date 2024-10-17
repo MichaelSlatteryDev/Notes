@@ -16,15 +16,24 @@ struct Note: Identifiable, Equatable, Codable {
         case userId
     }
     
-    let id: String
+    let id: String?
     var title: String
     var body: String
-    let userId: Int?
+    let userId: String
 
-    init(id: String, title: String, body: String, userId: Int? = nil) {
+    init(id: String? = nil, title: String, body: String, userId: String) {
         self.id = id
         self.title = title
         self.body = body
         self.userId = userId
+    }
+    
+    init(from decoder: Decoder) throws {
+       let container = try decoder.container(keyedBy: CodingKeys.self)
+        self.id = try container.decode(String.self, forKey: .id)
+        self.title = try container.decode(String.self, forKey: .title)
+        self.body = try container.decode(String.self, forKey: .body)
+        let userId = try container.decode(Int.self, forKey: .userId)
+        self.userId = String(userId)
     }
 }

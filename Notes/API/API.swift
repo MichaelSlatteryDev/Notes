@@ -10,7 +10,7 @@ import ComposableArchitecture
 
 struct API {
     
-    enum Endpoints {
+    enum Endpoints: Equatable {
         case notes
         case login(String)
         case register
@@ -32,8 +32,15 @@ struct API {
         }
     }
     
+    enum APIError: Error {
+        case usernameNotFound
+        case passwordNotFound
+    }
+    
+    @Dependency(\.keychainManager) static var keychainManager
+    
     var request: @Sendable (URLRequest) async throws -> (Data, URLResponse)
-    var authorizedRequest: @Sendable (URLRequest, String, String) async throws -> (Data, URLResponse)
+    var authorizedRequest: @Sendable (URLRequest) async throws -> (Data, URLResponse)
 }
 
 // MARK: DependencyKey
@@ -44,7 +51,15 @@ extension API: DependencyKey {
             mutatedRequest.setCommonHeaders()
             return try await URLSession.shared.data(for: mutatedRequest)
         },
-        authorizedRequest: { urlRequest, username, password in
+        authorizedRequest: { urlRequest in
+            
+            guard let username = UserDefaults.standard.string(forKey: "Username") else {
+                throw APIError.usernameNotFound
+            }
+            
+            guard let password = keychainManager.get(.password) else {
+                throw APIError.passwordNotFound
+            }
             
             var mutatedRequest = urlRequest
             let token: String? = await getToken(for: username, password: password)
@@ -71,7 +86,7 @@ extension API: DependencyKey {
                 }
                 return (data, response ?? URLResponse())
             },
-            authorizedRequest: { _, _, _ in
+            authorizedRequest: { _ in
                guard let data = initalData else {
                    throw NoDataError()
                }
@@ -85,7 +100,7 @@ extension API: DependencyKey {
 extension API {
     private static func getToken(for username: String, password: String) async -> String? {
         // Step 1: Check if the token exists in UserDefaults
-        if let storedToken = UserDefaults.standard.string(forKey: "jwtToken"),
+        if let storedToken = keychainManager.get(.token),
            !isTokenExpired(token: storedToken) {
             return storedToken
         } else {
@@ -100,12 +115,16 @@ extension API {
                 let (data, response) = try await URLSession.shared.data(for: authRequest)
                 if let newToken = String(data: data, encoding: .utf8), let httpResponse = response as? HTTPURLResponse {
                     if httpResponse.statusCode == 200 {
-                        // Step 3: Store the new token in UserDefaults
-                        UserDefaults.standard.set(newToken, forKey: "jwtToken")
+                        // Step 3: Store the new token in Keychain
+                        if keychainManager.get(.token) != nil {
+                            try keychainManager.update(.token, newToken)
+                        } else {
+                            try keychainManager.add(.token, newToken)
+                        }
                         
                         return newToken
                     } else {
-                        UserDefaults.standard.removeObject(forKey: "jwtToken")
+                        try keychainManager.delete(.token)
                     }
                 }
             } catch {
