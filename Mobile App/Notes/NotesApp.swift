@@ -17,9 +17,8 @@ struct NotesApp: App {
     
     var body: some Scene {
         WindowGroup {
+            
             LoginView(store: Self.store)
-//            NotesView(store: Self.store)
-//            AppView(store: Self.store)
         }
     }
 }

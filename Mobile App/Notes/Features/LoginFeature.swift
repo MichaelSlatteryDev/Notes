@@ -131,7 +131,6 @@ struct LoginView: View {
                     .stroke(Color.blue, lineWidth: 1)
             )
                         
-            // Optional: Add a "Forgot Password?" link
             Text("Forgot Password?")
                 .foregroundColor(.blue)
                 .onTapGesture {

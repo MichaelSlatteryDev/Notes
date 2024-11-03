@@ -102,6 +102,7 @@ extension API {
         // Step 1: Check if the token exists in UserDefaults
         if let storedToken = keychainManager.get(.token),
            !isTokenExpired(token: storedToken) {
+            print("Stored Token: " + storedToken)
             return storedToken
         } else {
             // Step 2: Token doesn't exist or expired, request a new token from verify
@@ -117,8 +118,10 @@ extension API {
                     if httpResponse.statusCode == 200 {
                         // Step 3: Store the new token in Keychain
                         if keychainManager.get(.token) != nil {
+                            print("Update Token: " + newToken)
                             try keychainManager.update(.token, newToken)
                         } else {
+                            print("New Token: " + newToken)
                             try keychainManager.add(.token, newToken)
                         }
                         
