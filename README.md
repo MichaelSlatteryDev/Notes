@@ -9,10 +9,6 @@ Currently made using The Composable Architecture (TCA). The app currently suppor
 - Login and registration
 - CRUD operations on notes
 
-### Known Issues
-
-- API token isn't cleared when restarting the app, which means if a different user logs in, they'll see another user's notes.
-
 ### Planned Improvements
 
 - Add error state UI handling
