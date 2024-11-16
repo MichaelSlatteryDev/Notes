@@ -36,7 +36,10 @@ struct NotesFeature {
         case destination(PresentationAction<Destination.Action>)
         case fetchNotes
         case notesFetched(IdentifiedArrayOf<Note>)
+        case logout
     }
+    
+    @Dependency(\.keychainManager) static var keychain
     
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -74,16 +77,28 @@ struct NotesFeature {
             case .destination:
                 return .none
             case .fetchNotes:
-                return .run { [api = state.api] send in
-                    let notes = try await api.getNotes()
+                return .run { [api = state.api, user = state.user] send in
+                    let notes = try await api.getNotes(for: user.id)
                     await send(.notesFetched(notes))
                 }
             case .notesFetched(let notes):
                 state.notes = notes
                 return .none
+            case .logout:
+                clearStoredUserData()
+                return .none
             }
         }
         .ifLet(\.$destination, action: \.destination)
+    }
+    
+    private func clearStoredUserData() {
+        do {
+            UserDefaults.standard.removeObject(forKey: "Username")
+            try Self.keychain.delete(.password)
+        } catch(let error) {
+            print(error)
+        }
     }
 }
 
@@ -98,48 +113,58 @@ struct NotesView: View {
     
     @Bindable var store: StoreOf<NotesFeature>
     
+    @Environment(\.dismiss) var dismiss
+    
     var body: some View {
-        NavigationStack {
-            List {
-                ForEach(store.notes) { note in
-                    HStack {
+        VStack {
+            NavigationStack {
+                List {
+                    ForEach(store.notes) { note in
                         HStack {
-                            Text(note.title)
-                                .font(.headline)
-                            Spacer()
+                            HStack {
+                                Text(note.title)
+                                    .font(.headline)
+                                Spacer()
+                            }
+                            .contentShape(Rectangle())
+                            .onTapGesture {
+                                store.send(.editNoteTapped(note))
+                            }
+                            
+                            Button {
+                                store.send(.deleteButtonTapped(note.id))
+                            } label: {
+                                Image(systemName: "trash")
+                                    .foregroundStyle(Color.red)
+                            }
+                            .padding(8)
+                            .accessibilityLabel("Delete note \(note.title)")
                         }
                         .contentShape(Rectangle())
-                        .onTapGesture {
-                            store.send(.editNoteTapped(note))
-                        }
-                        
-                        Button {
-                            store.send(.deleteButtonTapped(note.id))
-                        } label: {
-                            Image(systemName: "trash")
-                                .foregroundStyle(Color.red)
-                        }
-                        .padding(8)
-                        .accessibilityLabel("Delete note \(note.title)")
                     }
-                    .contentShape(Rectangle())
+                }
+                .navigationTitle("Notes")
+                .toolbar {
+                    ToolbarItem(placement: .topBarLeading) {
+                        Button("Refresh") {
+                            store.send(.fetchNotes)
+                        }
+                    }
+                    
+                    ToolbarItem(placement: .topBarTrailing) {
+                        Button {
+                            store.send(.addNoteTapped)
+                        } label: {
+                            Image(systemName: "plus")
+                        }
+                    }
                 }
             }
-            .navigationTitle("Notes")
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button("Refresh") {
-                        store.send(.fetchNotes)
-                    }
-                }
-                
-                ToolbarItem(placement: .topBarTrailing) {
-                    Button {
-                        store.send(.addNoteTapped)
-                    } label: {
-                        Image(systemName: "plus")
-                    }
-                }
+            Button {
+                store.send(.logout)
+                dismiss()
+            } label: {
+                Text("Log Out")
             }
         }
         .sheet(item: $store.scope(state: \.destination?.addNote, action: \.destination.addNote)) { addNotesStore in

@@ -24,6 +24,10 @@ public class NoteService {
         return noteRepositry.findAll();
     }
 
+    public List<NoteEntity> getAllNotesForUser(String id) {
+        return noteRepositry.findAllByUserId(Integer.parseInt(id));
+    }
+
     public NoteEntity getNoteById(Integer id) {
         return noteRepositry.findById(id).orElse(null);
     }

@@ -13,13 +13,29 @@ import SwiftUI
 struct LoginFeature {
     @ObservableState
     struct State: Equatable {
-        var user: User = User(name: "", password: "", notes: [])
+        var user: User
         @Presents var destination: Destination.State?
+        var loading: Bool?
+        
+        init(user: User? = nil) {
+            if let user = user {
+                self.user = user
+                return
+            }
+            
+            if let username = UserDefaults.standard.string(forKey: "Username"),
+               let password = keychain.get(.password) {
+                self.user = User(name: username, password: password, notes: [])
+            } else {
+                self.user = User(name: "", password: "", notes: [])
+            }
+        }
     }
     
     enum Action {
         case login
         case loginSuccess(User)
+        case loginFailed
         case registerButtonTapped
         case registerSuccess
         case setUsername(String)
@@ -28,35 +44,29 @@ struct LoginFeature {
     }
     
     @Dependency(\.api) var api
-    @Dependency(\.keychainManager) var keychain
+    @Dependency(\.keychainManager) static var keychain
     
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case .login:
+                state.loading = true
                 return .run { [user = state.user] send in
-                    var request = URLRequest(url: URL(string: API.Endpoints.login(user.name).value)!)
-                    request.httpMethod = "POST"
-                    if UserDefaults.standard.string(forKey: "Username") != nil,
-                       keychain.get(.password) != nil {
-                        let (data, _) = try await api.authorizedRequest(request)
-                        let authorizedUser = try JSONDecoder().decode(User.self, from: data)
-                        await send(.loginSuccess(authorizedUser))
-                    } else {
-                        UserDefaults.standard.set(user.name, forKey: "Username")
-                        try keychain.add(.password, user.password)
-                        
-                        let (data, _) = try await api.authorizedRequest(request)
-                        let authorizedUser = try JSONDecoder().decode(User.self, from: data)
-                        await send(.loginSuccess(authorizedUser))
-                    }
+                    let action = await loginRequest(for: user)
+                    await send(action)
                 } catch: { error, send in
                     print(error)
+                    clearStoredUserData()
                 }
             case .loginSuccess(let user):
                 state.destination = .login(
                     NotesFeature.State(user: user)
                 )
+                state.user = User()
+                state.loading = false
+                return .none
+            case .loginFailed:
+                state.loading = false
                 return .none
             case .registerButtonTapped:
                 return .run { [user = state.user] send in
@@ -83,6 +93,41 @@ struct LoginFeature {
         }
         .ifLet(\.$destination, action: \.destination)
     }
+    
+    private func loginRequest(for user: User) async -> Action {
+        guard !user.name.isEmpty && !user.password.isEmpty else { return .loginFailed }
+            
+        var request = URLRequest(url: URL(string: API.Endpoints.login(user.name).value)!)
+        request.httpMethod = "POST"
+        
+//        if UserDefaults.standard.string(forKey: "Username") == nil {
+        UserDefaults.standard.set(user.name, forKey: "Username")
+//        }
+        
+        do {
+            if Self.keychain.get(.password) == nil {
+                try Self.keychain.add(.password, user.password)
+            } else {
+                try Self.keychain.update(.password, user.password)
+            }
+            
+            let (data, _) = try await api.authorizedRequest(request)
+            let authorizedUser = try JSONDecoder().decode(User.self, from: data)
+            return .loginSuccess(authorizedUser)
+        } catch(let error) {
+            print(error)
+            return .loginFailed
+        }
+    }
+    
+    private func clearStoredUserData() {
+        do {
+            UserDefaults.standard.removeObject(forKey: "Username")
+            try Self.keychain.delete(.password)
+        } catch(let error) {
+            print(error)
+        }
+    }
 }
 
 extension LoginFeature {
@@ -97,51 +142,59 @@ struct LoginView: View {
     @Bindable var store: StoreOf<LoginFeature>
     
     var body: some View {
-        VStack(alignment: .center, spacing: 16.0) {
-            TextField("Username", text: $store.user.name.sending(\.setUsername))
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-            
-            SecureField("Enter your password", text: $store.user.password.sending(\.setPassword))
-                .textFieldStyle(RoundedBorderTextFieldStyle())
-            
-            Button(action: {
-                store.send(.login)
-            },
-            label: {
-                Text("Log In")
-            })
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(Color.blue)
-            .foregroundColor(.white)
-            .cornerRadius(8)
-            
-            Button(action: {
-                store.send(.registerButtonTapped)
-            },
-            label: {
-                Text("Register")
-            })
-            .frame(maxWidth: .infinity)
-            .padding()
-            .background(Color.white)
-            .foregroundColor(Color.blue)
-            .overlay(
-                RoundedRectangle(cornerRadius: 8)
-                    .stroke(Color.blue, lineWidth: 1)
-            )
-                        
-            Text("Forgot Password?")
-                .foregroundColor(.blue)
-                .onTapGesture {
-                    // Handle password recovery
+        ZStack {
+            if store.state.loading == true {
+                ProgressView()
+            } else {
+                VStack(alignment: .center, spacing: 16.0) {
+                    TextField("Username", text: $store.user.name.sending(\.setUsername))
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    
+                    SecureField("Enter your password", text: $store.user.password.sending(\.setPassword))
+                        .textFieldStyle(RoundedBorderTextFieldStyle())
+                    
+                    Button(action: {
+                        store.send(.login)
+                    }, label: {
+                        Text("Log In")
+                    })
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+                    
+                    Button(action: {
+                        store.send(.registerButtonTapped)
+                    },
+                           label: {
+                        Text("Register")
+                    })
+                    .frame(maxWidth: .infinity)
+                    .padding()
+                    .background(Color.white)
+                    .foregroundColor(Color.blue)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color.blue, lineWidth: 1)
+                    )
+                    
+                    Text("Forgot Password?")
+                        .foregroundColor(.blue)
+                        .onTapGesture {
+                            // Handle password recovery
+                        }
                 }
-        }
-        .padding()
-        .sheet(item: $store.scope(state: \.destination?.login, action: \.destination.login)) { noteStore in
-            NavigationStack {
-                NotesView(store: noteStore)
+                .padding()
+                .fullScreenCover(item: $store.scope(state: \.destination?.login, action: \.destination.login)) { noteStore in
+                    NavigationStack {
+                        NotesView(store: noteStore)
+                    }
+                }
             }
+        }
+        .onAppear {
+            store.send(.login)
         }
     }
 }

@@ -20,4 +20,18 @@ struct User: Codable, Equatable {
     var name: String
     var password: String
     var notes: [Note]
+    
+    public init(id: String? = nil, name: String, password: String, notes: [Note]) {
+        self.id = id
+        self.name = name
+        self.password = password
+        self.notes = notes
+    }
+    
+    public init() {
+        self.id = nil
+        self.name = ""
+        self.password = ""
+        self.notes = []
+    }
 }

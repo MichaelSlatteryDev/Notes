@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.notes.notes_spring.Documents.NoteEntity;
@@ -29,8 +30,8 @@ public class NoteController {
     private NoteService noteService;
 
     @GetMapping
-    public List<NoteData> getAllNotes() {
-        List<NoteEntity> notes = noteService.getAllNotes();
+    public List<NoteData> getAllNotesForUser(@RequestParam(required = true) String userId) {
+        List<NoteEntity> notes = noteService.getAllNotesForUser(userId);
         return notes.stream().map( noteEntity -> 
             new NoteData(noteEntity)
         )

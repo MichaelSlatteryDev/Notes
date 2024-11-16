@@ -13,8 +13,14 @@ struct NotesAPI: Equatable {
     @Dependency(\.api) var api
     let endpoint: API.Endpoints = .notes
     
-    func getNotes() async throws -> IdentifiedArrayOf<Note> {
-        var request = URLRequest(url: URL(string: endpoint.value)!)
+    func getNotes(for userId: String?) async throws -> IdentifiedArrayOf<Note> {
+        let baseUrl = URL(string: endpoint.value)!
+        
+        let url = baseUrl.appending(queryItems: [
+            URLQueryItem(name: "userId", value: userId)
+        ])
+        
+        let request = URLRequest(url: url)
         
         let (data, _) = try await api.authorizedRequest(request)
         
