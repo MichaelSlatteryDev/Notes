@@ -100,9 +100,7 @@ struct LoginFeature {
         var request = URLRequest(url: URL(string: API.Endpoints.login(user.name).value)!)
         request.httpMethod = "POST"
         
-//        if UserDefaults.standard.string(forKey: "Username") == nil {
         UserDefaults.standard.set(user.name, forKey: "Username")
-//        }
         
         do {
             if Self.keychain.get(.password) == nil {
