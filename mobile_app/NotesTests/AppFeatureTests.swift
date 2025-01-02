@@ -16,7 +16,7 @@ final class AppFeatureTests: XCTestCase {
         let store = TestStore(initialState: AppFeature.State()) {
             AppFeature()
         }
-        
+
         await store.send(\.tab1.incrementButtonTapped) { state in
             state.tab1.count = 1
         }

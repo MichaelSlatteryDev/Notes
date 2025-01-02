@@ -15,38 +15,38 @@ struct AddNotesFeature {
     struct State: Equatable {
         var note: Note
     }
-    
+
     enum Action {
         @CasePathable
         enum Delegate {
             case saveNote(Note)
         }
-        
+
         case cancelButtonTapped
         case delegate(Delegate)
         case saveButtonTapped
         case setDescription(String)
         case setTitle(String)
     }
-    
+
     @Dependency(\.dismiss) var dismiss
-    
+
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case .cancelButtonTapped:
-                return .run { _ in await self.dismiss() }
+                return .run { _ in await dismiss() }
             case .delegate:
                 return .none
             case .saveButtonTapped:
                 return .run { [note = state.note] send in
                     await send(.delegate(.saveNote(note)))
-                    await self.dismiss()
+                    await dismiss()
                 }
-            case .setDescription(let body):
+            case let .setDescription(body):
                 state.note.body = body
                 return .none
-            case .setTitle(let title):
+            case let .setTitle(title):
                 state.note.title = title
                 return .none
             }
@@ -55,9 +55,8 @@ struct AddNotesFeature {
 }
 
 struct AddNotesView: View {
-    
     @Bindable var store: StoreOf<AddNotesFeature>
-    
+
     var body: some View {
         VStack {
             TextField("Title", text: $store.note.title.sending(\.setTitle))
@@ -70,7 +69,7 @@ struct AddNotesView: View {
                     store.send(.cancelButtonTapped)
                 }
             }
-            
+
             ToolbarItem(placement: .topBarTrailing) {
                 Button("Save") {
                     store.send(.saveButtonTapped)

@@ -9,20 +9,19 @@ import Foundation
 import ComposableArchitecture
 
 struct API {
-    
     enum Endpoints: Equatable {
         case notes
         case login(String)
         case register
         case verify
-        
+
         private static var hostUrl = "http://localhost:8080"
-        
+
         var value: String {
             switch self {
             case .notes:
                 "\(Self.hostUrl)/notes"
-            case .login(let username):
+            case let .login(username):
                 "\(Self.hostUrl)/login/\(username)"
             case .register:
                 "\(Self.hostUrl)/register"
@@ -31,19 +30,20 @@ struct API {
             }
         }
     }
-    
+
     enum APIError: Error {
         case usernameNotFound
         case passwordNotFound
     }
-    
+
     @Dependency(\.keychainManager) static var keychainManager
-    
+
     var request: @Sendable (URLRequest) async throws -> (Data, URLResponse)
     var authorizedRequest: @Sendable (URLRequest) async throws -> (Data, URLResponse)
 }
 
 // MARK: DependencyKey
+
 extension API: DependencyKey {
     static var liveValue = Self(
         request: { urlRequest in
@@ -52,34 +52,34 @@ extension API: DependencyKey {
             return try await URLSession.shared.data(for: mutatedRequest)
         },
         authorizedRequest: { urlRequest in
-            
+
             guard let username = UserDefaults.standard.string(forKey: "Username") else {
                 throw APIError.usernameNotFound
             }
-            
+
             guard let password = keychainManager.get(.password) else {
                 throw APIError.passwordNotFound
             }
-            
+
             var mutatedRequest = urlRequest
             let token: String? = await getToken(for: username, password: password)
-            
+
             // Step 4: Add the token to the request header if it exists
             if let validToken = token {
                 mutatedRequest.setCommonHeaders()
                 mutatedRequest.setValue("Bearer \(validToken)", forHTTPHeaderField: "Authorization")
             }
-            
+
             return try await URLSession.shared.data(for: mutatedRequest)
         }
     )
-    
+
     static let previewValue = Self.mock()
-    
+
     struct NoDataError: Error {}
-    
+
     static func mock(initalData: Data? = nil, response: URLResponse? = nil) -> Self {
-        return Self(
+        Self(
             request: { _ in
                 guard let data = initalData else {
                     throw NoDataError()
@@ -87,16 +87,17 @@ extension API: DependencyKey {
                 return (data, response ?? URLResponse())
             },
             authorizedRequest: { _ in
-               guard let data = initalData else {
-                   throw NoDataError()
-               }
-               return (data, response ?? URLResponse())
+                guard let data = initalData else {
+                    throw NoDataError()
+                }
+                return (data, response ?? URLResponse())
             }
         )
     }
 }
 
 // MARK: Token
+
 extension API {
     private static func getToken(for username: String, password: String) async -> String? {
         // Step 1: Check if the token exists in UserDefaults
@@ -111,7 +112,7 @@ extension API {
             authRequest.httpBody = jsonData
             authRequest.httpMethod = "POST"
             authRequest.setCommonHeaders()
-            
+
             do {
                 let (data, response) = try await URLSession.shared.data(for: authRequest)
                 if let newToken = String(data: data, encoding: .utf8), let httpResponse = response as? HTTPURLResponse {
@@ -124,7 +125,7 @@ extension API {
                             print("New Token: " + newToken)
                             try keychainManager.add(.token, newToken)
                         }
-                        
+
                         return newToken
                     } else {
                         try keychainManager.delete(.token)
@@ -134,10 +135,10 @@ extension API {
                 print("Failed to fetch token: \(error)")
             }
         }
-        
+
         return nil
     }
-    
+
     // Helper function to check if the JWT token is expired
     private static func isTokenExpired(token: String) -> Bool {
         let components = token.split(separator: ".")

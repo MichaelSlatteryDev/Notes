@@ -5,8 +5,8 @@
 //  Created by Michael Slattery on 8/14/24.
 //
 
-import Foundation
 import ComposableArchitecture
+import Foundation
 import SwiftUI
 
 @Reducer
@@ -16,13 +16,13 @@ struct LoginFeature {
         var user: User
         @Presents var destination: Destination.State?
         var loading: Bool?
-        
+
         init(user: User? = nil) {
             if let user = user {
                 self.user = user
                 return
             }
-            
+
             if let username = UserDefaults.standard.string(forKey: "Username"),
                let password = keychain.get(.password) {
                 self.user = User(name: username, password: password, notes: [])
@@ -31,7 +31,7 @@ struct LoginFeature {
             }
         }
     }
-    
+
     enum Action {
         case login
         case loginSuccess(User)
@@ -42,10 +42,10 @@ struct LoginFeature {
         case setPassword(String)
         case destination(PresentationAction<Destination.Action>)
     }
-    
+
     @Dependency(\.api) var api
     @Dependency(\.keychainManager) static var keychain
-    
+
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
@@ -54,11 +54,11 @@ struct LoginFeature {
                 return .run { [user = state.user] send in
                     let action = await loginRequest(for: user)
                     await send(action)
-                } catch: { error, send in
+                } catch: { error, _ in
                     print(error)
                     clearStoredUserData()
                 }
-            case .loginSuccess(let user):
+            case let .loginSuccess(user):
                 state.destination = .login(
                     NotesFeature.State(user: user)
                 )
@@ -72,19 +72,19 @@ struct LoginFeature {
                 return .run { [user = state.user] send in
                     var request = URLRequest(url: URL(string: API.Endpoints.register.value)!)
                     request.httpMethod = "POST"
-                    
+
                     let jsonData = try? JSONEncoder().encode(user)
                     request.httpBody = jsonData
-                    
-                    let _ = try await api.request(request)
+
+                    _ = try await api.request(request)
                     await send(.registerSuccess)
                 }
             case .registerSuccess:
                 return .none
-            case .setUsername(let name):
+            case let .setUsername(name):
                 state.user.name = name
                 return .none
-            case .setPassword(let password):
+            case let .setPassword(password):
                 state.user.password = password
                 return .none
             case .destination:
@@ -93,36 +93,36 @@ struct LoginFeature {
         }
         .ifLet(\.$destination, action: \.destination)
     }
-    
+
     private func loginRequest(for user: User) async -> Action {
-        guard !user.name.isEmpty && !user.password.isEmpty else { return .loginFailed }
-            
+        guard !user.name.isEmpty, !user.password.isEmpty else { return .loginFailed }
+
         var request = URLRequest(url: URL(string: API.Endpoints.login(user.name).value)!)
         request.httpMethod = "POST"
-        
+
         UserDefaults.standard.set(user.name, forKey: "Username")
-        
+
         do {
             if Self.keychain.get(.password) == nil {
                 try Self.keychain.add(.password, user.password)
             } else {
                 try Self.keychain.update(.password, user.password)
             }
-            
+
             let (data, _) = try await api.authorizedRequest(request)
             let authorizedUser = try JSONDecoder().decode(User.self, from: data)
             return .loginSuccess(authorizedUser)
-        } catch(let error) {
+        } catch {
             print(error)
             return .loginFailed
         }
     }
-    
+
     private func clearStoredUserData() {
         do {
             UserDefaults.standard.removeObject(forKey: "Username")
             try Self.keychain.delete(.password)
-        } catch(let error) {
+        } catch {
             print(error)
         }
     }
@@ -136,9 +136,8 @@ extension LoginFeature {
 }
 
 struct LoginView: View {
-    
     @Bindable var store: StoreOf<LoginFeature>
-    
+
     var body: some View {
         ZStack {
             if store.state.loading == true {
@@ -147,10 +146,10 @@ struct LoginView: View {
                 VStack(alignment: .center, spacing: 16.0) {
                     TextField("Username", text: $store.user.name.sending(\.setUsername))
                         .textFieldStyle(RoundedBorderTextFieldStyle())
-                    
+
                     SecureField("Enter your password", text: $store.user.password.sending(\.setPassword))
                         .textFieldStyle(RoundedBorderTextFieldStyle())
-                    
+
                     Button(action: {
                         store.send(.login)
                     }, label: {
@@ -161,22 +160,22 @@ struct LoginView: View {
                     .background(Color.blue)
                     .foregroundColor(.white)
                     .cornerRadius(8)
-                    
+
                     Button(action: {
-                        store.send(.registerButtonTapped)
-                    },
+                               store.send(.registerButtonTapped)
+                           },
                            label: {
-                        Text("Register")
-                    })
-                    .frame(maxWidth: .infinity)
-                    .padding()
-                    .background(Color.white)
-                    .foregroundColor(Color.blue)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.blue, lineWidth: 1)
-                    )
-                    
+                               Text("Register")
+                           })
+                           .frame(maxWidth: .infinity)
+                           .padding()
+                           .background(Color.white)
+                           .foregroundColor(Color.blue)
+                           .overlay(
+                               RoundedRectangle(cornerRadius: 8)
+                                   .stroke(Color.blue, lineWidth: 1)
+                           )
+
                     Text("Forgot Password?")
                         .foregroundColor(.blue)
                         .onTapGesture {

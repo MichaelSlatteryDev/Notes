@@ -17,7 +17,7 @@ struct CounterFeature {
         var fact: String?
         var isTimerRunning = false
     }
-    
+
     enum Action {
         case incrementButtonTapped
         case decrementButtonTapped
@@ -26,16 +26,16 @@ struct CounterFeature {
         case toggleTimerButtonTapped
         case timerTick
     }
-    
+
     private enum CancelId: Hashable {
         case timer
     }
-    
+
     let id: UUID
-    
+
     @Dependency(\.continuousClock) var clock
     @Dependency(\.numberFact) var numberFact
-    
+
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
@@ -54,7 +54,7 @@ struct CounterFeature {
                     let fact = try await numberFact.fetch(count)
                     await send(.factResponse(fact))
                 }
-            case .factResponse(let fact):
+            case let .factResponse(fact):
                 state.fact = fact
                 state.isLoading = false
                 return .none
@@ -81,7 +81,7 @@ struct CounterFeature {
 
 struct CounterView: View {
     let store: StoreOf<CounterFeature>
-    
+
     var body: some View {
         VStack {
             Text("\(store.count)")
@@ -115,7 +115,7 @@ struct CounterView: View {
             .padding()
             .background(Color.black.opacity(0.1))
             .cornerRadius(10)
-            
+
             if store.isLoading {
                 ProgressView()
             } else if let fact = store.fact {
@@ -124,7 +124,7 @@ struct CounterView: View {
                     .multilineTextAlignment(.center)
                     .padding()
             }
-            
+
             Button(store.isTimerRunning ? "Stop Timer" : "Start Timer") {
                 store.send(.toggleTimerButtonTapped)
             }

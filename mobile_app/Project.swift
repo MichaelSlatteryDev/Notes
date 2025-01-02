@@ -2,6 +2,9 @@ import ProjectDescription
 
 let project = Project(
     name: "Notes",
+    packages: [
+        .remote(url: "https://github.com/SimplyDanny/SwiftLintPlugins", requirement: .upToNextMajor(from: "0.57.0")),
+    ],
     settings: .settings(configurations: [
         .debug(name: "Debug", xcconfig: "./xcconfigs/Notes-Project.xcconfig"),
         .release(name: "Release", xcconfig: "./xcconfigs/Notes-Project.xcconfig"),
@@ -17,6 +20,7 @@ let project = Project(
             resources: ["Notes/Resources/**"],
             dependencies: [
                 .external(name: "ComposableArchitecture"),
+                .package(product: "SwiftLintBuildToolPlugin", type: .plugin),
                 /** Dependencies go here **/
                 /** .external(name: "Kingfisher") **/
                 /** .target(name: "OtherProjectTarget") **/
@@ -35,7 +39,7 @@ let project = Project(
             sources: ["NotesTests/**"],
             resources: [],
             dependencies: [
-                .target(name: "Notes")
+                .target(name: "Notes"),
             ]
         ),
         .target(
@@ -47,7 +51,7 @@ let project = Project(
             sources: ["NotesUITests/**"],
             resources: [],
             dependencies: [
-                .target(name: "Notes")
+                .target(name: "Notes"),
             ]
         ),
     ]

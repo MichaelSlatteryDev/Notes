@@ -8,14 +8,13 @@
 import Foundation
 
 struct Note: Identifiable, Equatable, Codable {
-    
     enum CodingKeys: String, CodingKey {
         case id
         case title
         case body = "description"
         case userId
     }
-    
+
     let id: String?
     var title: String
     var body: String
@@ -27,12 +26,12 @@ struct Note: Identifiable, Equatable, Codable {
         self.body = body
         self.userId = userId
     }
-    
+
     init(from decoder: Decoder) throws {
-       let container = try decoder.container(keyedBy: CodingKeys.self)
-        self.id = try container.decode(String.self, forKey: .id)
-        self.title = try container.decode(String.self, forKey: .title)
-        self.body = try container.decode(String.self, forKey: .body)
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        id = try container.decode(String.self, forKey: .id)
+        title = try container.decode(String.self, forKey: .title)
+        body = try container.decode(String.self, forKey: .body)
         let userId = try container.decode(Int.self, forKey: .userId)
         self.userId = String(userId)
     }

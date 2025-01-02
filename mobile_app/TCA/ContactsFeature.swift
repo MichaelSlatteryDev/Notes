@@ -5,8 +5,8 @@
 //  Created by Michael Slattery on 6/8/24.
 //
 
-import Foundation
 import ComposableArchitecture
+import Foundation
 import SwiftUI
 
 struct Contact: Identifiable, Equatable {
@@ -16,25 +16,24 @@ struct Contact: Identifiable, Equatable {
 
 @Reducer
 struct ContactsFeature {
-    
     @ObservableState
     struct State: Equatable {
         @Presents var destination: Destination.State?
         var contacts: IdentifiedArrayOf<Contact> = []
     }
-    
+
     enum Action {
         enum Alert: Equatable {
             case confirmDeletion(Contact.ID)
         }
-        
+
         case addButtonTapped
         case deleteButtonTapped(Contact.ID)
         case destination(PresentationAction<Destination.Action>)
     }
-    
+
     @Dependency(\.uuid) var uuid
-    
+
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
@@ -45,15 +44,15 @@ struct ContactsFeature {
                     )
                 )
                 return .none
-            case .deleteButtonTapped(let id):
+            case let .deleteButtonTapped(id):
                 state.destination = .alert(
                     AlertState.deleteConfirmation(id: id)
                 )
                 return .none
-            case .destination(.presented(.addContact(.delegate(.saveContact(let contact))))):
+            case let .destination(.presented(.addContact(.delegate(.saveContact(contact))))):
                 state.contacts.append(contact)
                 return .none
-            case .destination(.presented(.alert(.confirmDeletion(let id)))):
+            case let .destination(.presented(.alert(.confirmDeletion(id)))):
                 state.contacts.remove(id: id)
                 return .none
             case .destination:
@@ -85,9 +84,8 @@ extension AlertState where Action == ContactsFeature.Action.Alert {
 }
 
 struct ContactsView: View {
-    
     @Bindable var store: StoreOf<ContactsFeature>
-    
+
     var body: some View {
         NavigationStack {
             List {
@@ -129,7 +127,8 @@ struct ContactsView: View {
         initialState: ContactsFeature.State(
             contacts: [.init(id: UUID(), name: "Foo"),
                        .init(id: UUID(), name: "Bar"),
-                       .init(id: UUID(), name: "Test")])) {
+                       .init(id: UUID(), name: "Test")]))
+    {
         ContactsFeature()
     })
 }

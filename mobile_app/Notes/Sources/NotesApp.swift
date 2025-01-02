@@ -5,8 +5,8 @@
 //  Created by Michael Slattery on 5/31/24.
 //
 
-import SwiftUI
 import ComposableArchitecture
+import SwiftUI
 
 @main
 struct NotesApp: App {
@@ -14,10 +14,9 @@ struct NotesApp: App {
         LoginFeature()
             ._printChanges()
     }
-    
+
     var body: some Scene {
         WindowGroup {
-            
             LoginView(store: Self.store)
         }
     }

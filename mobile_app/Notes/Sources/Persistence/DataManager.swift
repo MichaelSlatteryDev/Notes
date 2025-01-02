@@ -5,8 +5,8 @@
 //  Created by Michael Slattery on 6/23/24.
 //
 
-import Foundation
 import ComposableArchitecture
+import Foundation
 
 struct DataManager {
     var load: @Sendable (URL) throws -> Data
@@ -14,31 +14,30 @@ struct DataManager {
 }
 
 extension DataManager: DependencyKey {
-    
     struct SomeError: Error {}
     struct FileNotFoundError: Error {}
-    
+
     static var liveValue = Self(
-        load: { url in try Data(contentsOf: url)},
+        load: { url in try Data(contentsOf: url) },
         save: { data, url in try data.write(to: url) }
     )
-    
+
     static let previewValue = Self.mock()
-    
+
     static let failToWrite = Self(
         load: { _ in Data() },
         save: { _, _ in
             throw SomeError()
         }
     )
-    
+
     static let failToLoad = Self(
         load: { _ in
             throw SomeError()
         },
         save: { _, _ in }
     )
-    
+
     static func mock(initalData: Data? = nil) -> Self {
         let data = LockIsolated(initalData)
         return Self(

@@ -5,8 +5,8 @@
 //  Created by Michael Slattery on 6/22/24.
 //
 
-import Foundation
 import ComposableArchitecture
+import Foundation
 import SwiftUI
 
 extension URL {
@@ -20,15 +20,15 @@ struct NotesFeature {
         var user: User
         @Presents var destination: Destination.State?
         var notes: IdentifiedArrayOf<Note> = []
-        var api: NotesAPI = NotesAPI()
-        
+        var api: NotesAPI = .init()
+
         init(user: User, destination: Destination.State? = nil) {
             self.user = user
             self.destination = destination
-            self.notes = IdentifiedArray(uniqueElements: user.notes)
+            notes = IdentifiedArray(uniqueElements: user.notes)
         }
     }
-    
+
     enum Action {
         case addNoteTapped
         case editNoteTapped(Note)
@@ -38,9 +38,9 @@ struct NotesFeature {
         case notesFetched(IdentifiedArrayOf<Note>)
         case logout
     }
-    
+
     @Dependency(\.keychainManager) static var keychain
-    
+
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
@@ -49,19 +49,19 @@ struct NotesFeature {
                     AddNotesFeature.State(note: .init(id: "", title: "", body: "", userId: state.user.id ?? ""))
                 )
                 return .none
-            case .editNoteTapped(let note):
+            case let .editNoteTapped(note):
                 state.destination = .addNote(
                     AddNotesFeature.State(note: .init(id: note.id, title: note.title, body: note.body, userId: state.user.id ?? ""))
                 )
                 return .none
-            case .deleteButtonTapped(let id):
+            case let .deleteButtonTapped(id):
                 guard let id else { return .none }
-                
+
                 state.notes.remove(id: id)
                 return .run { [api = state.api] _ in
                     try await api.deleteNote(id: id)
                 }
-            case .destination(.presented(.addNote(.delegate(.saveNote(let note))))):
+            case let .destination(.presented(.addNote(.delegate(.saveNote(note))))):
                 if let index = state.notes.firstIndex(where: { $0.id == note.id }) {
                     state.notes[index] = note
                 } else {
@@ -81,7 +81,7 @@ struct NotesFeature {
                     let notes = try await api.getNotes(for: user.id)
                     await send(.notesFetched(notes))
                 }
-            case .notesFetched(let notes):
+            case let .notesFetched(notes):
                 state.notes = notes
                 return .none
             case .logout:
@@ -91,12 +91,12 @@ struct NotesFeature {
         }
         .ifLet(\.$destination, action: \.destination)
     }
-    
+
     private func clearStoredUserData() {
         do {
             UserDefaults.standard.removeObject(forKey: "Username")
             try Self.keychain.delete(.password)
-        } catch(let error) {
+        } catch {
             print(error)
         }
     }
@@ -110,11 +110,10 @@ extension NotesFeature {
 }
 
 struct NotesView: View {
-    
     @Bindable var store: StoreOf<NotesFeature>
-    
+
     @Environment(\.dismiss) var dismiss
-    
+
     var body: some View {
         VStack {
             NavigationStack {
@@ -130,7 +129,7 @@ struct NotesView: View {
                             .onTapGesture {
                                 store.send(.editNoteTapped(note))
                             }
-                            
+
                             Button {
                                 store.send(.deleteButtonTapped(note.id))
                             } label: {
@@ -150,7 +149,7 @@ struct NotesView: View {
                             store.send(.fetchNotes)
                         }
                     }
-                    
+
                     ToolbarItem(placement: .topBarTrailing) {
                         Button {
                             store.send(.addNoteTapped)
@@ -178,11 +177,11 @@ struct NotesView: View {
 #Preview {
     NotesView(store: Store(
         initialState: NotesFeature.State(user: .init(name: "Michael", password: "", notes: []))) {
-            NotesFeature()
-        } withDependencies: {
-            $0.dataManager = .mock(initalData: try? JSONEncoder().encode([Note(id: "note1", title: "Title 1", body: "Foo", userId: "1"),
-                                                                          Note(id: "note2", title: "Title 2", body: "Bar", userId: "1"),
-                                                                          Note(id: "note3", title: "Title 3", body: "Test", userId: "1")]))
-        }
+        NotesFeature()
+    } withDependencies: {
+        $0.dataManager = .mock(initalData: try? JSONEncoder().encode([Note(id: "note1", title: "Title 1", body: "Foo", userId: "1"),
+                                                                      Note(id: "note2", title: "Title 2", body: "Bar", userId: "1"),
+                                                                      Note(id: "note3", title: "Title 3", body: "Test", userId: "1")]))
+    }
     )
 }
